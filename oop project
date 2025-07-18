@@ -1,0 +1,156 @@
+class Library {
+  final Manager manger;
+  final Librarian librarian;
+  List<Book> bookRepo = [];
+  List<User> userRepo = [];
+
+  Library({required this.manger, required this.librarian});
+}
+
+abstract class Person {
+  final String name;
+  int age;
+
+  void displayInfo(); // Polymorphism
+
+  Person({required this.age, required this.name});
+}
+
+class User extends Person {
+  final int _id;
+  static int totalUsers = 0; // Static member
+
+  User({required super.age, required super.name, required int id}) : _id = id {
+    totalUsers++; // Increment total users when new user created
+  }
+
+  @override
+  void displayInfo() {
+    print("User Info:");
+    print("Name : $name");
+    print("Age : $age");
+    print("ID : $_id");
+  }
+
+  void borrowBook(String bookName, Library library) {
+    for (var book in library.bookRepo) {
+      if (book.name == bookName) {
+        print('Borrow process successful');
+        library.bookRepo.remove(book);
+        return;
+      }
+    }
+    print("Book doesn't exist");
+  }
+
+  static void showTotalUsers() {
+    print("Total users in system: $totalUsers");
+  }
+}
+
+class Empolyee extends Person {
+  final int _id;
+  int _salery; // Encapsulation: private property
+
+  Empolyee({
+    required super.age,
+    required super.name,
+    required int id,
+    required int salery,
+  })  : _id = id,
+        _salery = salery;
+
+  @override
+  void displayInfo() {
+    print("Employee Info:");
+    print("Name : $name");
+    print("Age : $age");
+    print("ID : $_id");
+    print("Salary : $_salery");
+  }
+
+  int get id => _id; // Getter
+  int get salery => _salery;
+  set salery(int value) => _salery = value; // Setter
+}
+
+class Librarian extends Empolyee {
+  Librarian({
+    required super.age,
+    required super.name,
+    required super.id,
+    required super.salery,
+  });
+
+  void addBook(Library library, Book book) {
+    library.bookRepo.add(book);
+    print("${book.name} was added to system");
+  }
+
+  void addNewUser(Library library, User user) {
+    library.userRepo.add(user);
+    print("${user.name} was added to system");
+  }
+
+  @override
+  void displayInfo() {
+    print("Librarian Info:");
+    super.displayInfo();
+  }
+}
+
+class Manager extends Empolyee {
+  Manager({
+    required super.age,
+    required super.name,
+    required super.id,
+    required super.salery,
+  });
+
+  void setSaleryToLibrarian(Librarian librarian, int newSalery) {
+    librarian.salery = newSalery;
+  }
+}
+
+class Book {
+  final String name;
+  final String auther;
+  final int ISBN;
+
+  Book(this.name, this.auther, this.ISBN);
+}
+
+void main() {
+  Library egyptLibrary = Library(
+    manger: Manager(age: 42, name: 'Youssef', id: 5586, salery: 20000),
+    librarian: Librarian(age: 25, name: 'Mohamed', id: 6204, salery: 5000),
+  );
+
+  egyptLibrary.bookRepo = [
+    Book('history', 'auther', 555),
+    Book('chim', 'auther', 414),
+    Book('OOP', 'auther', 785),
+    Book('dataStructure', 'auther', 1285),
+    Book('solid', 'auther', 252),
+    Book('flutter', 'auther', 50155),
+  ];
+
+  User ahmed = User(age: 19, name: "Ahmed", id: 974623);
+  User nada = User(age: 21, name: "Nada", id: 774511);
+
+  egyptLibrary.librarian.addNewUser(egyptLibrary, ahmed);
+  egyptLibrary.librarian.addNewUser(egyptLibrary, nada);
+
+  ahmed.borrowBook("chim", egyptLibrary);
+  ahmed.borrowBook("chim", egyptLibrary);
+  ahmed.borrowBook("rr", egyptLibrary);
+
+  ahmed.displayInfo(); // Polymorphism
+  egyptLibrary.librarian.displayInfo(); // Polymorphism
+
+  User.showTotalUsers(); // Static Method
+
+  print("Librarian salary before: ${egyptLibrary.librarian.salery}");
+  egyptLibrary.manger.setSaleryToLibrarian(egyptLibrary.librarian, 6000);
+  print("Librarian salary after: ${egyptLibrary.librarian.salery}");
+}
